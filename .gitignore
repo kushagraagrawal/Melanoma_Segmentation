@@ -1,0 +1,6 @@
+__pycache__/
+imgs_mask_train.npy
+imgs_train.npy
+isic-challenge-2017/
+observations/
+.DS_Store
