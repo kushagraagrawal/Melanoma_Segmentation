@@ -90,4 +90,4 @@ def get_unet(dropout):
     return model
 
 if __name__ == "__main__":
-    get_unet(True)
+    model = get_unet(True)

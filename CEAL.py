@@ -2,6 +2,7 @@ from __future__ import print_function
 from keras.callbacks import ModelCheckpoint
 from data import load_train_data
 from utils import *
+import os
 
 create_paths()
 log_file = open(global_path + "logs/log_file.txt", 'a')
@@ -11,3 +12,27 @@ labeled_index = np.arange(0, nb_labeled)
 unlabeled_index = np.arange(nb_labeled, len(X_train))
 
 model = get_unet(dropout=True)
+if os.path.exists(initial_weights_path):
+    model.load_weights(initial_weights_path)
+
+if initial_train:
+    model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
+
+    if apply_augmentation:
+        for initial_epoch in range(0, nb_initial_epochs):
+            history = model.fit_generator(
+                data_generator().flow(X_train[labeled_index], y_train[labeled_index], batch_size=32, shuffle=True),
+                steps_per_epoch=len(labeled_index), epochs=1, verbose=1, callbacks=[model_checkpoint]
+            )
+        
+            model.save(initial_weights_path)
+            log(history, initial_epoch, log_file)
+
+    else:
+        history = model.fit(X_train[labeled_index], y_train[labeled_index], batch_size=32, epochs=nb_initial_epochs, verbose=1, shuffle=True, callbacks=[model_checkpoint])
+
+        log(history, 0, log_file)
+else:
+    model.load_weights(initial_weights_path)
+
+print("did this work?.......")

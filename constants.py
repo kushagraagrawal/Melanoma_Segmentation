@@ -4,8 +4,8 @@ initial_weights_path = "models/init_weights.hdf5"
 final_weights_path = "models/final_weights.hdf5"
 
 # Data definition
-img_rows = 420
-img_cols = 580
+img_rows = 64*3
+img_cols = 80*3
 
 nb_total = 2000
 nb_train = 1600
