@@ -1,5 +1,5 @@
 # Melanoma_Segmentation
-Melanoma Segmentation using Active Learning
+Melanoma Segmentation using Active Learning. test
 
 # References
 1. CEAL paper - [Cost-Effective Active Learning for Melanoma Segmentation](https://arxiv.org/pdf/1711.09168.pdf)
