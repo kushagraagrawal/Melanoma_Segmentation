@@ -36,4 +36,19 @@ if initial_train:
 else:
     model.load_weights(initial_weights_path)
 
-print("did this work?.......")
+model_checkpoint = tf.keras.callbacks.ModelCheckpoint(final_weights_path, monitor='loss', save_best_only=True)
+
+for iteration in range(1, nb_iterations+1):
+    if iteration == 1:
+        weights = initial_weights_path
+    else:
+        weights = final_weights_path
+    
+    X_labeled_train, y_labeled_train, labeled_index, unlabeled_index = compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights, iteration)
+
+    history = model.fit(X_labeled_train, y_labeled_train, batch_size=32, epochs=nb_active_epochs, verbose=1, shuffle=True, callbacks=[model_checkpoint])
+
+    log(history, iteration, log_file)
+    model.save(global_path + "models/active_model" + str(iteration) + ".h5")
+
+log_file.close()

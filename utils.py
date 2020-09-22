@@ -20,7 +20,7 @@ def range_transform(sample):
     return (m * sample + n) / 255
 
 def predict(data, model):
-    return model.predict(data, verbose=0)
+    return model.predict(data, verbose=1)
 
 def compute_uncertain(sample, prediction, model):
     X = np.zeros([1, img_rows, img_cols])
@@ -111,8 +111,8 @@ def compute_dice_coef(y_true, y_pred):
     :return: Dice-Coefficient value.
     """
     smooth = 1.  # smoothing value to deal zero denominators.
-    y_true_f = y_true.reshape([1, img_rows * img_cols])
-    y_pred_f = y_pred.reshape([1, img_rows * img_cols])
+    y_true_f = y_true.reshape([img_rows * img_cols, 1])
+    y_pred_f = y_pred.reshape([img_rows * img_cols, 1])
     intersection = np.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
 
@@ -153,11 +153,13 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         if index % 100 == 0:
             print("completed: " + str(index) + "/" + str(len(unlabeled_index)))
 
-        sample = X_train[unlabeled_index[index]].reshape([1, 1, img_rows, img_cols])
+        print()
+
+        sample = X_train[unlabeled_index[index]].reshape([1, img_rows, img_cols, 1])
 
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
 
-        accuracy[index] = compute_dice_coef(y_train[unlabeled_index[index]][0], sample_prediction)
+        accuracy[index] = compute_dice_coef(y_train[unlabeled_index[index]], sample_prediction)
         uncertain[index] = compute_uncertain(sample, sample_prediction, modelUncertain)
 
     np.save(global_path + "logs/uncertain" + str(iteration), uncertain)
@@ -185,8 +187,8 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         y_labeled_train = np.concatenate((y_train[labeled_index], predictions[pseudo_index]))
 
     else:
-        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
-        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), 1, img_rows, img_cols])
+        X_labeled_train = np.concatenate((X_train[labeled_index])).reshape([len(labeled_index), img_rows, img_cols, 1])
+        y_labeled_train = np.concatenate((y_train[labeled_index])).reshape([len(labeled_index), img_rows, img_cols, 1])
 
     unlabeled_index = np.delete(unlabeled_index, oracle_index, 0)
 
