@@ -11,7 +11,7 @@ import tensorflow as tf
 from constants import img_rows, img_cols
 
 # tf.enable_eager_execution()
-tf.keras.backend.set_image_data_format('channels_first')
+tf.keras.backend.set_image_data_format('channels_last')
 
 smooth = 1
 
@@ -40,7 +40,7 @@ tf.keras.layers.Dropout.call = call
 
 # 
 def get_unet(dropout):
-    inputs = tf.keras.layers.Input((1, img_rows, img_cols))
+    inputs = tf.keras.layers.Input((img_rows, img_cols, 1))
     conv1 = tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same',input_shape=inputs.shape)(inputs)
     conv1 = tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same')(conv1)
     pool1 = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))(conv1)
@@ -65,22 +65,22 @@ def get_unet(dropout):
     if dropout:
         conv5 = tf.keras.layers.Dropout(0.5)(conv5)    
 
-    up6 = tf.keras.layers.Concatenate(axis=1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv5), conv4])
+    up6 = tf.keras.layers.Concatenate(axis=-1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv5), conv4])
 
     conv6 = tf.keras.layers.Conv2D(256, 3, activation='relu', padding='same')(up6)
     conv6 = tf.keras.layers.Conv2D(256, 3, activation='relu', padding='same')(conv6)
 
-    up7 = tf.keras.layers.Concatenate(axis=1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv6), conv3])
+    up7 = tf.keras.layers.Concatenate(axis=-1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv6), conv3])
 
     conv7 = tf.keras.layers.Conv2D(128, 3, activation='relu', padding='same')(up7)
     conv7 = tf.keras.layers.Conv2D(128, 3, activation='relu', padding='same')(conv7)
 
-    up8 = tf.keras.layers.Concatenate(axis=1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv7), conv2])
+    up8 = tf.keras.layers.Concatenate(axis=-1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv7), conv2])
 
     conv8 = tf.keras.layers.Conv2D(64, 3, activation='relu', padding='same')(up8)
     conv8 = tf.keras.layers.Conv2D(64, 3, activation='relu', padding='same')(conv8)
 
-    up9 = tf.keras.layers.Concatenate(axis=1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv8), conv1])
+    up9 = tf.keras.layers.Concatenate(axis=-1)([tf.keras.layers.UpSampling2D(size=(2, 2))(conv8), conv1])
 
     conv9 = tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same')(up9)
     conv9 = tf.keras.layers.Conv2D(32, 3, activation='relu', padding='same')(conv9)

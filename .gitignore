@@ -4,3 +4,4 @@ imgs_train.npy
 isic-challenge-2017/
 observations/
 .DS_Store
+models/

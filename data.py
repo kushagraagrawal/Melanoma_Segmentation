@@ -9,9 +9,11 @@ import cv2
 from constants import *
 
 def preprocessor(input_img):
-    output_img = np.ndarray((input_img.shape[0], input_img.shape[1], img_rows, img_cols), dtype=np.uint8)
+    output_img = np.ndarray((input_img.shape[0], img_rows, img_cols, input_img.shape[3]), dtype=np.uint8)
     for i in range(input_img.shape[0]):
-        output_img[i, 0] = cv2.resize(input_img[i, 0], (img_cols, img_rows), interpolation=cv2.INTER_CUBIC)
+        img = cv2.resize(input_img[i], (img_cols, img_rows), interpolation=cv2.INTER_CUBIC)
+        img = np.asarray(img).reshape((img_rows, img_cols, input_img.shape[3]))
+        output_img[i] = img
     return output_img
 
 def create_train_data(data_path, masks_path):
@@ -26,9 +28,8 @@ def create_train_data(data_path, masks_path):
     masks = os.listdir(masks_path)
     total = len(images)
 
-    imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
-    print(imgs.shape)
-    imgs_mask = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
+    imgs = np.ndarray((total, image_rows, image_cols, 1), dtype=np.uint8)
+    imgs_mask = np.ndarray((total,image_rows, image_cols, 1), dtype=np.uint8)
     i = 0
 
     for image_name in images:
@@ -38,7 +39,7 @@ def create_train_data(data_path, masks_path):
             continue
         try:
             img = cv2.resize(img, (image_cols, image_rows), interpolation=cv2.INTER_CUBIC)
-            img = np.array([img])
+            img = np.asarray(img).reshape((image_rows, image_cols, 1))
             imgs[i] = img
             i+=1
         except Exception as e:
@@ -55,7 +56,7 @@ def create_train_data(data_path, masks_path):
         else:
             continue
         img_mask = cv2.resize(img_mask, (image_cols, image_rows), interpolation=cv2.INTER_CUBIC)
-        img_mask = np.array([img_mask])
+        img_mask = np.asarray(img_mask).reshape((image_rows, image_cols, 1))
         imgs_mask[i] = img_mask
         i+=1
 

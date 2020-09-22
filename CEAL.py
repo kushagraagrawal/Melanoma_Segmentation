@@ -1,5 +1,6 @@
 from __future__ import print_function
-from keras.callbacks import ModelCheckpoint
+import tensorflow as tf
+# from keras.callbacks import ModelCheckpoint
 from data import load_train_data
 from utils import *
 import os
@@ -16,7 +17,7 @@ if os.path.exists(initial_weights_path):
     model.load_weights(initial_weights_path)
 
 if initial_train:
-    model_checkpoint = ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
+    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(initial_weights_path, monitor='loss', save_best_only=True)
 
     if apply_augmentation:
         for initial_epoch in range(0, nb_initial_epochs):
