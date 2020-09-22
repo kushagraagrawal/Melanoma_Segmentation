@@ -153,8 +153,6 @@ def compute_train_sets(X_train, y_train, labeled_index, unlabeled_index, weights
         if index % 100 == 0:
             print("completed: " + str(index) + "/" + str(len(unlabeled_index)))
 
-        print()
-
         sample = X_train[unlabeled_index[index]].reshape([1, img_rows, img_cols, 1])
 
         sample_prediction = cv2.threshold(predictions[index], 0.5, 1, cv2.THRESH_BINARY)[1].astype('uint8')
